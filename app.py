@@ -171,7 +171,6 @@ def generate_pdf_bytes(data):
     pdf.write(10, "Marks : ")
     pdf.line(162, footer_y, 195, footer_y)
 
-    # Return PDF content as bytes instead of a local disk file save
     return pdf.output()
 
 # --- STREAMLIT WEB APP UI ---
