@@ -263,9 +263,23 @@ if submitted:
             pdf_bytes = generate_pdf_bytes(payload)
         
         st.success("🎉 Layout Compiled Successfully!")
-        st.download_button(
-            label="⬇️ Download PDF Report",
-            data=pdf_bytes,
-            file_name=f"Report_Work_{work_no}.pdf",
-            mime="application/pdf"
-        )
+        
+        # Action column layout wrapper for action buttons
+        col_dl, col_ig = st.columns([1, 1])
+        
+        with col_dl:
+            st.download_button(
+                label="⬇️ Download PDF Report",
+                data=pdf_bytes,
+                file_name=f"Report_Work_{work_no}.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+            
+        with col_ig:
+            # Connect your Instagram profile handle seamlessly here
+            st.link_button(
+                label="📸 Connect on Instagram",
+                url="https://www.instagram.com/sohammistry_176",
+                use_container_width=True
+            )
