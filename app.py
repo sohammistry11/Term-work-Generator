@@ -274,7 +274,7 @@ if submitted:
         st.download_button(
             label="⬇️ Download PDF Report",
             data=pdf_bytes,
-            file_name=f"Report_Work_{work_no}.pdf",
+            file_name=f"Term_Work_{work_no}.pdf",
             mime="application/pdf",
             use_container_width=True
         )
