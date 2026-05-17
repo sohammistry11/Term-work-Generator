@@ -228,6 +228,14 @@ st.set_page_config(page_title="GTU Report Generator", page_icon="📄", layout="
 st.title("📄 Practical / Term-Work Report Generator")
 st.write("Fill out the details below to generate a perfectly aligned document.")
 
+# UI CHANGE: This renders immediately when the page loads, before anyone submits details!
+st.link_button(
+    label="📸 Connect with me on Instagram (@sohammistry_176)",
+    url="https://www.instagram.com/sohammistry_176",
+    use_container_width=True
+)
+st.write("") # Quick vertical spacing element
+
 with st.form("report_form"):
     st.subheader("Common Institutional Info")
     col1, col2 = st.columns(2)
@@ -240,7 +248,7 @@ with st.form("report_form"):
         sem = st.text_input("Semester", placeholder="e.g., 4")
         cls = st.text_input("Class", placeholder="e.g., CSE 24-B")
         batch = st.text_input("Batch", placeholder="e.g., 244")
-        faculty = st.text_input("Faculty Member (Checked By)", placeholder="e.g., Mr. Yash Bharatkumar Naik")
+        faculty = st.text_input("Faculty Member (Checked By)", placeholder="e.g., Mr. Xyz Abc Pqr")
         
     st.subheader("Report Specific Assignment Details")
     work_no = st.text_input("Practical / Term Work No.", placeholder="e.g., 27")
@@ -263,23 +271,10 @@ if submitted:
             pdf_bytes = generate_pdf_bytes(payload)
         
         st.success("🎉 Layout Compiled Successfully!")
-        
-        # Action column layout wrapper for action buttons
-        col_dl, col_ig = st.columns([1, 1])
-        
-        with col_dl:
-            st.download_button(
-                label="⬇️ Download PDF Report",
-                data=pdf_bytes,
-                file_name=f"Report_Work_{work_no}.pdf",
-                mime="application/pdf",
-                use_container_width=True
-            )
-            
-        with col_ig:
-            # Connect your Instagram profile handle seamlessly here
-            st.link_button(
-                label="📸 Connect on Instagram",
-                url="https://www.instagram.com/sohammistry_176",
-                use_container_width=True
-            )
+        st.download_button(
+            label="⬇️ Download PDF Report",
+            data=pdf_bytes,
+            file_name=f"Report_Work_{work_no}.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
