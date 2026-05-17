@@ -151,4 +151,121 @@ def generate_pdf_bytes(data):
                 avail_width = 175
                 
         if pdf.get_string_width(line_data[idx] + word + " ") < (avail_width - 2):
-            line_data
+            line_data[idx] += word + " "
+        elif idx < 2:
+            idx += 1
+            line_data[idx] += word + " "
+
+    # Float clean layout text arrays across the dynamic segments
+    pdf.set_y(118)
+    pdf.set_x(title_start_x + 2)
+    pdf.cell(195 - title_start_x - 2, 10, line_data[0].strip(), align='L')
+    
+    pdf.set_y(128)
+    pdf.set_x(22) 
+    pdf.cell(173, 10, line_data[1].strip(), align='L')
+    
+    pdf.set_y(138)
+    pdf.set_x(22) 
+    pdf.cell(173, 10, line_data[2].strip(), align='L')
+
+    # ==========================================
+    # 3. FIXED LOWER TRACKING COLUMN SYSTEM
+    # ==========================================
+    
+    def render_aligned_row(label_text, value_text, y_pos):
+        pdf.set_y(y_pos - 8)
+        pdf.set_x(20)
+        pdf.cell(118, 10, label_text, align='R')
+        pdf.line(138, y_pos, 195, y_pos)
+        pdf.set_x(138)
+        pdf.cell(57, 10, str(value_text), align='C')
+
+    render_aligned_row("Practical / Term Work No. : ", data['work_no'], 168)
+    render_aligned_row("Conducted On : ", "    /       /    ", 177)
+    render_aligned_row("Date of Submission : ", "    /       /    ", 186)
+    render_aligned_row("Actual Date of Submission : ", "    /       /    ", 195)
+
+    # Checked By & Remarks Rows
+    pdf.set_y(210)
+    pdf.set_x(20)
+    pdf.write(10, "Checked By : ")
+    pdf.line(46, 218, 195, 218)
+    pdf.set_x(48)
+    pdf.cell(147, 10, str(data['faculty']), align='L')
+    
+    pdf.set_y(222)
+    pdf.set_x(20)
+    pdf.write(10, "Remarks : ")
+    pdf.line(41, 230, 195, 230)
+
+    # --- FOOTER BLOCK ---
+    footer_y = 255
+    pdf.set_y(footer_y - 8)
+    
+    # Signature
+    pdf.set_x(20)
+    pdf.write(10, "Signature : ")
+    pdf.line(43, footer_y, 85, footer_y)
+    
+    # Date
+    pdf.set_x(90)
+    pdf.write(10, "Date: ")
+    pdf.line(102, footer_y, 142, footer_y)
+    pdf.set_x(102)
+    pdf.cell(40, 10, "   /   /", align='C')
+    
+    # Marks
+    pdf.set_x(147)
+    pdf.write(10, "Marks : ")
+    pdf.line(162, footer_y, 195, footer_y)
+
+    # Return output safely wrapped as crisp binary bytes
+    return bytes(pdf.output())
+
+# --- STREAMLIT WEB APP UI ---
+st.set_page_config(page_title="GTU Report Generator", page_icon="📄", layout="centered")
+st.title("📄 Practical / Term-Work Report Generator")
+st.write("Fill out the details below to generate a perfectly aligned document.")
+
+with st.form("report_form"):
+    st.subheader("Common Institutional Info")
+    col1, col2 = st.columns(2)
+    with col1:
+        term = st.text_input("TERM", placeholder="e.g., 252")
+        subject = st.text_input("Subject Title", placeholder="e.g., OPERATING SYSTEMS(1CS401)")
+        pen = st.text_input("PEN (Enrollment Number)", placeholder="e.g., 250843131014")
+        name = st.text_input("Student Name", placeholder="e.g., Mistry SohamKumar Bharatbhai")
+    with col2:
+        sem = st.text_input("Semester", placeholder="e.g., 4")
+        cls = st.text_input("Class", placeholder="e.g., CSE 24-B")
+        batch = st.text_input("Batch", placeholder="e.g., 244")
+        faculty = st.text_input("Faculty Member (Checked By)", placeholder="e.g., Mr. Yash Bharatkumar Naik")
+        
+    st.subheader("Report Specific Assignment Details")
+    work_no = st.text_input("Practical / Term Work No.", placeholder="e.g., 27")
+    title = st.text_area("Experiment / Assignment Title", placeholder="e.g., Study of various features of O.S and its types.")
+
+    submitted = st.form_submit_button("Compile & Verify Layout")
+
+# Renders selectively only when processing active entries
+if submitted:
+    if not work_no or not title:
+        st.error("Please fill in at least the 'Work No' and 'Experiment Title' to generate a file.")
+    else:
+        payload = {
+            "term": term, "subject": subject, "pen": pen, "name": name,
+            "sem": sem, "cls": cls, "batch": batch, "faculty": faculty,
+            "work_no": work_no, "title": title
+        }
+        
+        with st.spinner("Compiling document layers..."):
+            pdf_bytes = generate_pdf_bytes(payload)
+        
+        st.success("🎉 Layout Compiled Successfully!")
+        st.download_button(
+            label="⬇️ Download PDF Report",
+            data=pdf_bytes,
+            file_name=f"Report_Work_{work_no}.pdf",
+            mime="application/pdf"
+        )
